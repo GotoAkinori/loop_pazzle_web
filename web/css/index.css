@@ -1,0 +1,38 @@
+.config {
+    width: 100%;
+    border-bottom: 1px solid #555;
+}
+
+.stage_size {
+    width: 30px;
+}
+
+#stage {
+    background-color: #DDF;
+    width: 100%;
+    height: 500px;
+}
+
+#stage text {
+    user-select: none;
+}
+
+#stage line {
+    user-select: none;
+}
+
+#stage line.none {
+    stroke: black;
+    stroke-width: 1px;
+    stroke-dasharray: 3px;
+}
+
+#stage line.x {
+    fill: none;
+    stroke: none;
+}
+
+#stage line.line {
+    stroke: black;
+    stroke-width: 2px;
+}

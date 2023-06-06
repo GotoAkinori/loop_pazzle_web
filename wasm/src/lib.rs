@@ -77,10 +77,11 @@ fn make_puzzle_unit(stage: &mut SolvingStage, solve_depth: &mut i32) -> SolveRes
         //  - over depth (OVER_DEPTH)
         //    => return to 2-nd level loop in order to new number.
 
+        let mut try_count = 0;
+
         loop {
             // over depth / multi answer
             let mut new_stage = stage.clone();
-            let mut try_count = 0;
 
             loop {
                 // Add new number
@@ -136,6 +137,7 @@ fn make_puzzle_unit(stage: &mut SolvingStage, solve_depth: &mut i32) -> SolveRes
                 } else if new_result.has_answer {
                     // multi answer (MUL_ANS)
                     join_stage(stage, &new_stage);
+                    try_count = 0;
                     break;
                 } else {
                     // over depth (OVER_DEPTH)

@@ -1,17 +1,17 @@
 {
-  "name": "loop_pazzle_web",
+  "name": "loop_puzzle_web",
   "version": "0.1.0",
   "license": "MIT/Apache-2.0",
   "files": [
-    "loop_pazzle_web_bg.wasm",
-    "loop_pazzle_web.js",
-    "loop_pazzle_web_bg.js",
-    "loop_pazzle_web.d.ts"
+    "loop_puzzle_web_bg.wasm",
+    "loop_puzzle_web.js",
+    "loop_puzzle_web_bg.js",
+    "loop_puzzle_web.d.ts"
   ],
-  "module": "loop_pazzle_web.js",
-  "types": "loop_pazzle_web.d.ts",
+  "module": "loop_puzzle_web.js",
+  "types": "loop_puzzle_web.d.ts",
   "sideEffects": [
-    "./loop_pazzle_web.js",
+    "./loop_puzzle_web.js",
     "./snippets/*"
   ]
 }

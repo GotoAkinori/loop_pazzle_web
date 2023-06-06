@@ -1,1 +1,1 @@
-npm link loop_pazzle_web
+npm link loop_puzzle_web

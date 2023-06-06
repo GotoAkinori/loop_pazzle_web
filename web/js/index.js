@@ -2,55 +2,55 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "../wasm/pkg/loop_pazzle_web.js":
+/***/ "../wasm/pkg/loop_puzzle_web.js":
 /*!**************************************!*\
-  !*** ../wasm/pkg/loop_pazzle_web.js ***!
+  !*** ../wasm/pkg/loop_puzzle_web.js ***!
   \**************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.a(module, async (__webpack_handle_async_dependencies__, __webpack_async_result__) => { try {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   __wbg_buffer_55ba7a6b1b92e2ac: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_buffer_55ba7a6b1b92e2ac),
-/* harmony export */   __wbg_call_557a2f2deacc4912: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_call_557a2f2deacc4912),
-/* harmony export */   __wbg_call_587b30eea3e09332: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_call_587b30eea3e09332),
-/* harmony export */   __wbg_crypto_70a96de3b6b73dac: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_crypto_70a96de3b6b73dac),
-/* harmony export */   __wbg_getRandomValues_3774744e221a22ad: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_getRandomValues_3774744e221a22ad),
-/* harmony export */   __wbg_globalThis_b70c095388441f2d: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_globalThis_b70c095388441f2d),
-/* harmony export */   __wbg_global_1c72617491ed7194: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_global_1c72617491ed7194),
-/* harmony export */   __wbg_msCrypto_adbc770ec9eca9c7: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_msCrypto_adbc770ec9eca9c7),
-/* harmony export */   __wbg_new_09938a7d020f049b: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_new_09938a7d020f049b),
-/* harmony export */   __wbg_newnoargs_c9e6043b8ad84109: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_newnoargs_c9e6043b8ad84109),
-/* harmony export */   __wbg_newwithbyteoffsetandlength_88d1d8be5df94b9b: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_newwithbyteoffsetandlength_88d1d8be5df94b9b),
-/* harmony export */   __wbg_newwithlength_89eeca401d8918c2: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_newwithlength_89eeca401d8918c2),
-/* harmony export */   __wbg_node_6a9d28205ed5b0d8: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_node_6a9d28205ed5b0d8),
-/* harmony export */   __wbg_process_dd1577445152112e: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_process_dd1577445152112e),
-/* harmony export */   __wbg_randomFillSync_e950366c42764a07: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_randomFillSync_e950366c42764a07),
-/* harmony export */   __wbg_require_f05d779769764e82: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_require_f05d779769764e82),
-/* harmony export */   __wbg_self_742dd6eab3e9211e: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_self_742dd6eab3e9211e),
-/* harmony export */   __wbg_set_3698e3ca519b3c3c: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_3698e3ca519b3c3c),
-/* harmony export */   __wbg_set_wasm: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_wasm),
-/* harmony export */   __wbg_subarray_d82be056deb4ad27: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_subarray_d82be056deb4ad27),
-/* harmony export */   __wbg_versions_58036bec3add9e6f: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_versions_58036bec3add9e6f),
-/* harmony export */   __wbg_window_c409e731db53a0e2: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_window_c409e731db53a0e2),
-/* harmony export */   __wbindgen_is_function: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_function),
-/* harmony export */   __wbindgen_is_object: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_object),
-/* harmony export */   __wbindgen_is_string: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_string),
-/* harmony export */   __wbindgen_is_undefined: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_undefined),
-/* harmony export */   __wbindgen_memory: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_memory),
-/* harmony export */   __wbindgen_object_clone_ref: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_object_clone_ref),
-/* harmony export */   __wbindgen_object_drop_ref: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_object_drop_ref),
-/* harmony export */   __wbindgen_string_new: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_string_new),
-/* harmony export */   __wbindgen_throw: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_throw),
-/* harmony export */   make_puzzle_web: () => (/* reexport safe */ _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.make_puzzle_web)
+/* harmony export */   __wbg_buffer_55ba7a6b1b92e2ac: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_buffer_55ba7a6b1b92e2ac),
+/* harmony export */   __wbg_call_557a2f2deacc4912: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_call_557a2f2deacc4912),
+/* harmony export */   __wbg_call_587b30eea3e09332: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_call_587b30eea3e09332),
+/* harmony export */   __wbg_crypto_70a96de3b6b73dac: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_crypto_70a96de3b6b73dac),
+/* harmony export */   __wbg_getRandomValues_3774744e221a22ad: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_getRandomValues_3774744e221a22ad),
+/* harmony export */   __wbg_globalThis_b70c095388441f2d: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_globalThis_b70c095388441f2d),
+/* harmony export */   __wbg_global_1c72617491ed7194: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_global_1c72617491ed7194),
+/* harmony export */   __wbg_msCrypto_adbc770ec9eca9c7: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_msCrypto_adbc770ec9eca9c7),
+/* harmony export */   __wbg_new_09938a7d020f049b: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_new_09938a7d020f049b),
+/* harmony export */   __wbg_newnoargs_c9e6043b8ad84109: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_newnoargs_c9e6043b8ad84109),
+/* harmony export */   __wbg_newwithbyteoffsetandlength_88d1d8be5df94b9b: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_newwithbyteoffsetandlength_88d1d8be5df94b9b),
+/* harmony export */   __wbg_newwithlength_89eeca401d8918c2: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_newwithlength_89eeca401d8918c2),
+/* harmony export */   __wbg_node_6a9d28205ed5b0d8: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_node_6a9d28205ed5b0d8),
+/* harmony export */   __wbg_process_dd1577445152112e: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_process_dd1577445152112e),
+/* harmony export */   __wbg_randomFillSync_e950366c42764a07: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_randomFillSync_e950366c42764a07),
+/* harmony export */   __wbg_require_f05d779769764e82: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_require_f05d779769764e82),
+/* harmony export */   __wbg_self_742dd6eab3e9211e: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_self_742dd6eab3e9211e),
+/* harmony export */   __wbg_set_3698e3ca519b3c3c: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_3698e3ca519b3c3c),
+/* harmony export */   __wbg_set_wasm: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_wasm),
+/* harmony export */   __wbg_subarray_d82be056deb4ad27: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_subarray_d82be056deb4ad27),
+/* harmony export */   __wbg_versions_58036bec3add9e6f: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_versions_58036bec3add9e6f),
+/* harmony export */   __wbg_window_c409e731db53a0e2: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_window_c409e731db53a0e2),
+/* harmony export */   __wbindgen_is_function: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_function),
+/* harmony export */   __wbindgen_is_object: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_object),
+/* harmony export */   __wbindgen_is_string: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_string),
+/* harmony export */   __wbindgen_is_undefined: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_is_undefined),
+/* harmony export */   __wbindgen_memory: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_memory),
+/* harmony export */   __wbindgen_object_clone_ref: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_object_clone_ref),
+/* harmony export */   __wbindgen_object_drop_ref: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_object_drop_ref),
+/* harmony export */   __wbindgen_string_new: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_string_new),
+/* harmony export */   __wbindgen_throw: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_throw),
+/* harmony export */   make_puzzle_web: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.make_puzzle_web)
 /* harmony export */ });
-/* harmony import */ var _loop_pazzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./loop_pazzle_web_bg.wasm */ "../wasm/pkg/loop_pazzle_web_bg.wasm");
-/* harmony import */ var _loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./loop_pazzle_web_bg.js */ "../wasm/pkg/loop_pazzle_web_bg.js");
-var __webpack_async_dependencies__ = __webpack_handle_async_dependencies__([_loop_pazzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__]);
-_loop_pazzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__ = (__webpack_async_dependencies__.then ? (await __webpack_async_dependencies__)() : __webpack_async_dependencies__)[0];
+/* harmony import */ var _loop_puzzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./loop_puzzle_web_bg.wasm */ "../wasm/pkg/loop_puzzle_web_bg.wasm");
+/* harmony import */ var _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./loop_puzzle_web_bg.js */ "../wasm/pkg/loop_puzzle_web_bg.js");
+var __webpack_async_dependencies__ = __webpack_handle_async_dependencies__([_loop_puzzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__]);
+_loop_puzzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__ = (__webpack_async_dependencies__.then ? (await __webpack_async_dependencies__)() : __webpack_async_dependencies__)[0];
 
 
-(0,_loop_pazzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_wasm)(_loop_pazzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__);
+(0,_loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_wasm)(_loop_puzzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__);
 
 
 __webpack_async_result__();
@@ -58,9 +58,9 @@ __webpack_async_result__();
 
 /***/ }),
 
-/***/ "../wasm/pkg/loop_pazzle_web_bg.js":
+/***/ "../wasm/pkg/loop_puzzle_web_bg.js":
 /*!*****************************************!*\
-  !*** ../wasm/pkg/loop_pazzle_web_bg.js ***!
+  !*** ../wasm/pkg/loop_puzzle_web_bg.js ***!
   \*****************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
@@ -385,7 +385,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const stage_1 = __webpack_require__(/*! ./stage */ "./ts/stage.ts");
 let make_puzzle_web;
-Promise.resolve().then(() => __importStar(__webpack_require__(/*! ../node_modules/loop_pazzle_web/loop_pazzle_web.js */ "../wasm/pkg/loop_pazzle_web.js"))).then((js) => __awaiter(void 0, void 0, void 0, function* () {
+Promise.resolve().then(() => __importStar(__webpack_require__(/*! ../node_modules/loop_puzzle_web/loop_puzzle_web.js */ "../wasm/pkg/loop_puzzle_web.js"))).then((js) => __awaiter(void 0, void 0, void 0, function* () {
     make_puzzle_web = (yield js.default).make_puzzle_web;
 }));
 let stage;
@@ -583,15 +583,15 @@ exports.LineItem = LineItem;
 
 /***/ }),
 
-/***/ "../wasm/pkg/loop_pazzle_web_bg.wasm":
+/***/ "../wasm/pkg/loop_puzzle_web_bg.wasm":
 /*!*******************************************!*\
-  !*** ../wasm/pkg/loop_pazzle_web_bg.wasm ***!
+  !*** ../wasm/pkg/loop_puzzle_web_bg.wasm ***!
   \*******************************************/
 /***/ ((module, exports, __webpack_require__) => {
 
-/* harmony import */ var WEBPACK_IMPORTED_MODULE_0 = __webpack_require__(/*! ./loop_pazzle_web_bg.js */ "../wasm/pkg/loop_pazzle_web_bg.js");
-module.exports = __webpack_require__.v(exports, module.id, "dee2bd06187a796bd683", {
-	"./loop_pazzle_web_bg.js": {
+/* harmony import */ var WEBPACK_IMPORTED_MODULE_0 = __webpack_require__(/*! ./loop_puzzle_web_bg.js */ "../wasm/pkg/loop_puzzle_web_bg.js");
+module.exports = __webpack_require__.v(exports, module.id, "7ac3146e3fc9722ce051", {
+	"./loop_puzzle_web_bg.js": {
 		"__wbg_crypto_70a96de3b6b73dac": WEBPACK_IMPORTED_MODULE_0.__wbg_crypto_70a96de3b6b73dac,
 		"__wbindgen_is_object": WEBPACK_IMPORTED_MODULE_0.__wbindgen_is_object,
 		"__wbg_process_dd1577445152112e": WEBPACK_IMPORTED_MODULE_0.__wbg_process_dd1577445152112e,

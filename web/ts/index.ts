@@ -1,7 +1,7 @@
 import { Stage } from "./stage";
 
 let make_puzzle_web: (size_r: number, size_c: number) => string;
-import("../node_modules/loop_pazzle_web/loop_pazzle_web.js").then(async (js) => {
+import("../node_modules/loop_puzzle_web/loop_puzzle_web.js").then(async (js) => {
     make_puzzle_web = (await js.default).make_puzzle_web;
 });
 

@@ -1,7 +1,7 @@
 {
   "scripts": {
     "serve": "webpack-dev-server",
-    "link": "link",
+    "link": "npm link loop_puzzle_web",
     "webpack": "webpack"
   },
   "dependencies": {

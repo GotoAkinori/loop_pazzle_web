@@ -94,6 +94,9 @@ pub struct SolvingStage {
     pub size_c: isize,
     pub group: Vec<Vec<i64>>,
     pub result: bool,
+    // 0: not checked, 1: checked but not completed, 2:completed.
+    pub checked: Vec<Vec<u8>>,
+    pub score: u32,
 }
 
 pub fn idx_point(r: isize, c: isize) -> RowCol {
@@ -161,6 +164,8 @@ impl SolvingStage {
             size_r,
             group: vec![vec![0; size_c as usize]; size_r as usize],
             result: true,
+            checked: vec![vec![0; size_c as usize]; size_r as usize],
+            score: 0,
         };
 
         for r in 0..size_r {
@@ -178,7 +183,7 @@ impl SolvingStage {
         return stage;
     }
 
-    pub fn dump(&mut self) {
+    pub fn dump(&self) {
         println!("===============================");
         println!("");
         for r in 0..(self.size_r + 1) {
@@ -261,6 +266,82 @@ impl SolvingStage {
                 println!("{line2}");
             }
         }
+    }
+
+    pub fn marge(&mut self, stage: &Self) {
+        for r in 0..(self.size_r) {
+            for c in 0..(self.size_c) {
+                if number!(self, r, c) != number!(stage, r, c) && number!(self, r, c) == -1 {
+                    number!(self, r, c) = number!(stage, r, c);
+                    self.checked[r as usize][c as usize] = 0;
+                }
+            }
+        }
+        for r in 0..(self.size_r) {
+            for c in 0..(self.size_c + 1) {
+                if v_line!(self, r, c) != v_line!(stage, r, c) && v_line!(self, r, c) == -1 {
+                    let line_pos = idx_v_line(r, c);
+                    self.set_line(line_pos, v_line!(self, r, c));
+                }
+            }
+        }
+        for r in 0..(self.size_r + 1) {
+            for c in 0..(self.size_c) {
+                if h_line!(self, r, c) != h_line!(stage, r, c) && h_line!(self, r, c) == -1 {
+                    let line_pos = idx_h_line(r, c);
+                    self.set_line(line_pos, h_line!(self, r, c));
+                }
+            }
+        }
+        for r in 0..(self.size_r + 1) {
+            for c in 0..(self.size_c + 1) {
+                if point!(self, r, c) != point!(stage, r, c) {
+                    let pos = idx_point(r, c);
+                    self.restrict_point_possibility_bat(pos, point!(stage, r, c));
+                }
+            }
+        }
+    }
+
+    pub fn get_lines_pos(&self) -> Vec<(isize, isize, bool)> {
+        let mut lines: Vec<(isize, isize, bool)> = vec![];
+
+        for r in 0..(self.size_r) {
+            for c in 0..(self.size_c + 1) {
+                lines.push((r, c, true));
+            }
+        }
+        for r in 0..(self.size_r + 1) {
+            for c in 0..(self.size_c) {
+                lines.push((r, c, false));
+            }
+        }
+
+        return lines;
+    }
+
+    pub fn get_numbers_pos(&self) -> Vec<(isize, isize)> {
+        let mut nums: Vec<(isize, isize)> = vec![];
+
+        for r in 0..(self.size_r) {
+            for c in 0..(self.size_c) {
+                nums.push((r, c));
+            }
+        }
+
+        return nums;
+    }
+
+    pub fn get_points_pos(&self) -> Vec<(isize, isize)> {
+        let mut nums: Vec<(isize, isize)> = vec![];
+
+        for r in 0..(self.size_r) {
+            for c in 0..(self.size_c) {
+                nums.push((r, c));
+            }
+        }
+
+        return nums;
     }
 
     #[cfg(test)]
@@ -401,6 +482,33 @@ impl SolvingStage {
     pub fn remove_point_possibility(&mut self, target: RowCol, p: i8) -> u32 {
         if (value!(self, target.r, target.c) & p) == p {
             value!(self, target.r, target.c) &= !p;
+
+            if target.r < self.size_r * 2
+                && target.c < self.size_c * 2
+                && self.checked[(target.r / 2) as usize][(target.c / 2) as usize] == 1
+            {
+                self.checked[(target.r / 2) as usize][(target.c / 2) as usize] = 0;
+            }
+            if target.r < self.size_r * 2
+                && target.c > 0
+                && self.checked[(target.r / 2) as usize][(target.c / 2 - 1) as usize] == 1
+            {
+                self.checked[(target.r / 2) as usize][(target.c / 2 - 1) as usize] = 0;
+            }
+            if target.r > 0
+                && target.c < self.size_c * 2
+                && self.checked[(target.r / 2 - 1) as usize][(target.c / 2) as usize] == 1
+            {
+                self.checked[(target.r / 2 - 1) as usize][(target.c / 2) as usize] = 0;
+            }
+            if target.c > 0
+                && target.r > 0
+                && self.checked[(target.r / 2 - 1) as usize][(target.c / 2 - 1) as usize] == 1
+            {
+                self.checked[(target.r / 2 - 1) as usize][(target.c / 2 - 1) as usize] = 0;
+            }
+
+            self.score += K_POINT_POS;
             return K_POINT_POS;
         } else {
             return 0;
@@ -421,9 +529,37 @@ impl SolvingStage {
         return self.remove_point_possibility_bat(target, P_ALL & !p);
     }
 
-    fn set_line(&mut self, target: RowCol, line: i8) -> u32 {
+    pub fn set_line(&mut self, target: RowCol, line: i8) -> u32 {
         if value!(self, target.r, target.c) == -1 {
             value!(self, target.r, target.c) = line;
+
+            if target.r % 2 == 1 {
+                // virtical line
+                if target.c < self.size_c * 2
+                    && self.checked[((target.r - 1) / 2) as usize][(target.c / 2) as usize] == 1
+                {
+                    self.checked[((target.r - 1) / 2) as usize][(target.c / 2) as usize] = 0;
+                }
+                if target.c > 0
+                    && self.checked[((target.r - 1) / 2) as usize][(target.c / 2 - 1) as usize] == 1
+                {
+                    self.checked[((target.r - 1) / 2) as usize][(target.c / 2 - 1) as usize] = 0;
+                }
+            } else {
+                // horizontal line
+                if target.r < self.size_r * 2
+                    && self.checked[(target.r / 2) as usize][((target.c - 1) / 2) as usize] == 1
+                {
+                    self.checked[(target.r / 2) as usize][((target.c - 1) / 2) as usize] = 0;
+                }
+                if target.r > 0
+                    && self.checked[(target.r / 2 - 1) as usize][((target.c - 1) / 2) as usize] == 1
+                {
+                    self.checked[(target.r / 2 - 1) as usize][((target.c - 1) / 2) as usize] = 0;
+                }
+            }
+
+            self.score += K_LINE;
             return K_LINE;
         } else if value!(self, target.r, target.c) == line {
             return 0;
@@ -455,6 +591,7 @@ impl SolvingStage {
                 h_line!(self, r, c) = 0;
                 h_line!(self, r + 1, c) = 0;
             }
+            self.checked[r as usize][c as usize] = 2;
         } else if number!(self, r, c) == 1 {
             //  o---+
             //  | 1 |
@@ -498,6 +635,9 @@ impl SolvingStage {
         let mut counter: u32 = 0;
         let num = number!(self, r, c);
         let center = idx_number(r, c);
+        if self.checked[r as usize][c as usize] != 0 {
+            return 0;
+        }
 
         {
             // check if line is filled around the number
@@ -520,20 +660,20 @@ impl SolvingStage {
                     self.result = false;
                 } else if line_count == num {
                     if v_line!(self, r, c) == -1 {
-                        v_line!(self, r, c) = 0;
-                        counter += 1;
+                        let ln = idx_v_line(r, c);
+                        counter += self.set_line(ln, 0);
                     }
                     if v_line!(self, r, c + 1) == -1 {
-                        v_line!(self, r, c + 1) = 0;
-                        counter += 1;
+                        let ln = idx_v_line(r, c + 1);
+                        counter += self.set_line(ln, 0);
                     }
                     if h_line!(self, r, c) == -1 {
-                        h_line!(self, r, c) = 0;
-                        counter += 1;
+                        let ln = idx_h_line(r, c);
+                        counter += self.set_line(ln, 0);
                     }
                     if h_line!(self, r + 1, c) == -1 {
-                        h_line!(self, r + 1, c) = 0;
-                        counter += 1;
+                        let ln = idx_h_line(r + 1, c);
+                        counter += self.set_line(ln, 0);
                     }
                 }
             }
@@ -560,20 +700,20 @@ impl SolvingStage {
                     self.result = false;
                 } else if none_line_count == 4 - num {
                     if v_line!(self, r, c) == -1 {
-                        v_line!(self, r, c) = 1;
-                        counter += 1;
+                        let ln = idx_v_line(r, c);
+                        counter += self.set_line(ln, 1);
                     }
                     if v_line!(self, r, c + 1) == -1 {
-                        v_line!(self, r, c + 1) = 1;
-                        counter += 1;
+                        let ln = idx_v_line(r, c + 1);
+                        counter += self.set_line(ln, 1);
                     }
                     if h_line!(self, r, c) == -1 {
-                        h_line!(self, r, c) = 1;
-                        counter += 1;
+                        let ln = idx_h_line(r, c);
+                        counter += self.set_line(ln, 1);
                     }
                     if h_line!(self, r + 1, c) == -1 {
-                        h_line!(self, r + 1, c) = 1;
-                        counter += 1;
+                        let ln = idx_h_line(r + 1, c);
+                        counter += self.set_line(ln, 1);
                     }
                 }
             }
@@ -672,6 +812,8 @@ impl SolvingStage {
             }
         }
 
+        self.checked[r as usize][c as usize] = 1;
+
         return counter;
     }
 
@@ -727,21 +869,21 @@ impl SolvingStage {
                 for rot in 0..4 {
                     let ln = rot_rc(idx_v_line(r - 1, c), center, rot);
                     if self.in_bound(ln) && value!(self, ln.r, ln.c) == -1 {
-                        value!(self, ln.r, ln.c) = 0;
+                        counter += self.set_line(ln, 0);
                     }
                 }
             } else if count_x == 3 {
                 for rot in 0..4 {
                     let ln = rot_rc(idx_v_line(r - 1, c), center, rot);
                     if self.in_bound(ln) && value!(self, ln.r, ln.c) == -1 {
-                        value!(self, ln.r, ln.c) = 0;
+                        counter += self.set_line(ln, 0);
                     }
                 }
             } else if count_line == 1 && count_x == 2 {
                 for rot in 0..4 {
                     let ln = rot_rc(idx_v_line(r - 1, c), center, rot);
                     if self.in_bound(ln) && value!(self, ln.r, ln.c) == -1 {
-                        value!(self, ln.r, ln.c) = 1;
+                        counter += self.set_line(ln, 1);
                     }
                 }
             }

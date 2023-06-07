@@ -42,7 +42,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   __wbindgen_object_drop_ref: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_object_drop_ref),
 /* harmony export */   __wbindgen_string_new: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_string_new),
 /* harmony export */   __wbindgen_throw: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.__wbindgen_throw),
-/* harmony export */   make_puzzle_web: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.make_puzzle_web)
+/* harmony export */   make_puzzle_web: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.make_puzzle_web),
+/* harmony export */   make_puzzle_web2: () => (/* reexport safe */ _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__.make_puzzle_web2)
 /* harmony export */ });
 /* harmony import */ var _loop_puzzle_web_bg_wasm__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./loop_puzzle_web_bg.wasm */ "../wasm/pkg/loop_puzzle_web_bg.wasm");
 /* harmony import */ var _loop_puzzle_web_bg_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./loop_puzzle_web_bg.js */ "../wasm/pkg/loop_puzzle_web_bg.js");
@@ -97,7 +98,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   __wbindgen_object_drop_ref: () => (/* binding */ __wbindgen_object_drop_ref),
 /* harmony export */   __wbindgen_string_new: () => (/* binding */ __wbindgen_string_new),
 /* harmony export */   __wbindgen_throw: () => (/* binding */ __wbindgen_throw),
-/* harmony export */   make_puzzle_web: () => (/* binding */ make_puzzle_web)
+/* harmony export */   make_puzzle_web: () => (/* binding */ make_puzzle_web),
+/* harmony export */   make_puzzle_web2: () => (/* binding */ make_puzzle_web2)
 /* harmony export */ });
 /* module decorator */ module = __webpack_require__.hmd(module);
 let wasm;
@@ -174,6 +176,28 @@ function make_puzzle_web(size_r, size_c) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         wasm.make_puzzle_web(retptr, size_r, size_c);
+        var r0 = getInt32Memory0()[retptr / 4 + 0];
+        var r1 = getInt32Memory0()[retptr / 4 + 1];
+        deferred1_0 = r0;
+        deferred1_1 = r1;
+        return getStringFromWasm0(r0, r1);
+    } finally {
+        wasm.__wbindgen_add_to_stack_pointer(16);
+        wasm.__wbindgen_free(deferred1_0, deferred1_1);
+    }
+}
+
+/**
+* @param {number} size_r
+* @param {number} size_c
+* @returns {string}
+*/
+function make_puzzle_web2(size_r, size_c) {
+    let deferred1_0;
+    let deferred1_1;
+    try {
+        const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
+        wasm.make_puzzle_web2(retptr, size_r, size_c);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         deferred1_0 = r0;
@@ -385,8 +409,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const stage_1 = __webpack_require__(/*! ./stage */ "./ts/stage.ts");
 let make_puzzle_web;
+let make_puzzle_web2;
 Promise.resolve().then(() => __importStar(__webpack_require__(/*! ../node_modules/loop_puzzle_web/loop_puzzle_web.js */ "../wasm/pkg/loop_puzzle_web.js"))).then((js) => __awaiter(void 0, void 0, void 0, function* () {
     make_puzzle_web = (yield js.default).make_puzzle_web;
+    make_puzzle_web2 = (yield js.default).make_puzzle_web2;
 }));
 let stage;
 function init() {
@@ -395,7 +421,7 @@ function init() {
         document.getElementById("new_puzzle").addEventListener("click", () => {
             let width = Number(document.getElementById("stage_width").value);
             let height = Number(document.getElementById("stage_height").value);
-            let puzzle_string = make_puzzle_web(height, width);
+            let puzzle_string = make_puzzle_web2(height, width);
             stage.init(width, height, puzzle_string);
         });
     });
@@ -590,7 +616,7 @@ exports.LineItem = LineItem;
 /***/ ((module, exports, __webpack_require__) => {
 
 /* harmony import */ var WEBPACK_IMPORTED_MODULE_0 = __webpack_require__(/*! ./loop_puzzle_web_bg.js */ "../wasm/pkg/loop_puzzle_web_bg.js");
-module.exports = __webpack_require__.v(exports, module.id, "7ac3146e3fc9722ce051", {
+module.exports = __webpack_require__.v(exports, module.id, "bd207f80483677d97668", {
 	"./loop_puzzle_web_bg.js": {
 		"__wbg_crypto_70a96de3b6b73dac": WEBPACK_IMPORTED_MODULE_0.__wbg_crypto_70a96de3b6b73dac,
 		"__wbindgen_is_object": WEBPACK_IMPORTED_MODULE_0.__wbindgen_is_object,

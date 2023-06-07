@@ -369,33 +369,48 @@ mod tests {
     }
 
     mod create {
-        use crate::make_puzzle;
-        use std::time::Instant;
+        use crate::{make_puzzle, make_puzzle2};
 
         #[test]
         fn make_puzzle_5_5() {
-            let mut stage = make_puzzle(5, 5);
+            let stage = make_puzzle(5, 5);
             stage.dump();
         }
-
         #[test]
-        fn check_time() {
-            let count = 20;
-
-            let time_start = Instant::now();
-            for i in 0..count {
-                let time_local_start = Instant::now();
-                make_puzzle(7, 7);
-                let time_local_end = Instant::now();
-                println!(
-                    "[{}] {:?}",
-                    i + 1,
-                    time_local_end.duration_since(time_local_start)
-                );
-            }
-            let time_end = Instant::now();
-
-            println!("Total: {:?}", time_end.duration_since(time_start));
+        fn make_puzzle2_5_5() {
+            let stage = make_puzzle2(5, 5, &vec![2, 2], &5);
+            stage.dump();
         }
+        #[test]
+        fn make_puzzle2_x_x() {
+            let stage = make_puzzle2(10, 10, &vec![2, 2], &5);
+            stage.dump();
+        }
+    }
+}
+
+#[cfg(test)]
+mod measure_time {
+    use crate::make_puzzle2;
+    use std::time::Instant;
+
+    #[test]
+    fn check_time() {
+        let count = 20;
+
+        let time_start = Instant::now();
+        for i in 0..count {
+            let time_local_start = Instant::now();
+            make_puzzle2(10, 10, &vec![2, 2], &5);
+            let time_local_end = Instant::now();
+            println!(
+                "[{}] {:?}",
+                i + 1,
+                time_local_end.duration_since(time_local_start)
+            );
+        }
+        let time_end = Instant::now();
+
+        println!("Total: {:?}", time_end.duration_since(time_start));
     }
 }

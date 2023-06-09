@@ -423,17 +423,17 @@ function init() {
         stageSvg.addEventListener("click", (ev) => {
             if (!preventClick) {
                 let stageRect = stageSvg.getBoundingClientRect();
-                stage.click(ev.clientX - stageRect.left - stage.scrollX, ev.clientY - stageRect.top - stage.scrollY);
+                stage.click(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
             }
             else {
                 preventClick = false;
             }
         });
         stageSvg.addEventListener("contextmenu", (ev) => {
+            ev.preventDefault();
             if (!preventClick) {
-                ev.preventDefault();
                 let stageRect = stageSvg.getBoundingClientRect();
-                stage.rclick(ev.clientX - stageRect.left - stage.scrollX, ev.clientY - stageRect.top - stage.scrollY);
+                stage.rclick(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
             }
             else {
                 preventClick = false;
@@ -535,6 +535,7 @@ class Stage {
     }
     init(width, height, data) {
         this.puzzleLayer.innerHTML = "";
+        this.decorationLayer.innerHTML = "";
         this.v_line.length = 0;
         this.h_line.length = 0;
         this.width = width;
@@ -585,10 +586,12 @@ class Stage {
         this.saveLineInfo();
     }
     getClosestLine(x, y) {
-        let fx = Math.floor((x - MARGIN_STAGE) / LINE_LENGTH);
-        let rx = x - fx * LINE_LENGTH - MARGIN_STAGE;
-        let fy = Math.floor((y - MARGIN_STAGE) / LINE_LENGTH);
-        let ry = y - fy * LINE_LENGTH - MARGIN_STAGE;
+        let stagePosX = (x - this.scrollX) / this.scale;
+        let stagePosY = (y - this.scrollY) / this.scale;
+        let fx = Math.floor((stagePosX - MARGIN_STAGE) / LINE_LENGTH);
+        let rx = stagePosX - fx * LINE_LENGTH - MARGIN_STAGE;
+        let fy = Math.floor((stagePosY - MARGIN_STAGE) / LINE_LENGTH);
+        let ry = stagePosY - fy * LINE_LENGTH - MARGIN_STAGE;
         let isVirtical;
         if (rx < ry && rx + ry < LINE_LENGTH) {
             isVirtical = true;

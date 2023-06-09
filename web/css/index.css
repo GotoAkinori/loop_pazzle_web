@@ -14,10 +14,12 @@
 }
 
 #stage text {
+    -webkit-user-select: none;
     user-select: none;
 }
 
 #stage line {
+    -webkit-user-select: none;
     user-select: none;
 }
 

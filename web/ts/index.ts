@@ -18,20 +18,20 @@ async function init() {
         if (!preventClick) {
             let stageRect = stageSvg.getBoundingClientRect();
             stage.click(
-                ev.clientX - stageRect.left - stage.scrollX,
-                ev.clientY - stageRect.top - stage.scrollY
+                ev.clientX - stageRect.left,
+                ev.clientY - stageRect.top
             );
         } else {
             preventClick = false;
         }
     });
     stageSvg.addEventListener("contextmenu", (ev) => {
+        ev.preventDefault();
         if (!preventClick) {
-            ev.preventDefault();
             let stageRect = stageSvg.getBoundingClientRect();
             stage.rclick(
-                ev.clientX - stageRect.left - stage.scrollX,
-                ev.clientY - stageRect.top - stage.scrollY
+                ev.clientX - stageRect.left,
+                ev.clientY - stageRect.top
             );
         } else {
             preventClick = false;

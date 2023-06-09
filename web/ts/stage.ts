@@ -29,6 +29,7 @@ export class Stage {
     }
     public init(width: number, height: number, data: string) {
         this.puzzleLayer.innerHTML = "";
+        this.decorationLayer.innerHTML = "";
         this.v_line.length = 0;
         this.h_line.length = 0;
         this.width = width;
@@ -91,10 +92,13 @@ export class Stage {
         isVirtical: boolean,
         inFrame: boolean
     } {
-        let fx = Math.floor((x - MARGIN_STAGE) / LINE_LENGTH);
-        let rx = x - fx * LINE_LENGTH - MARGIN_STAGE;
-        let fy = Math.floor((y - MARGIN_STAGE) / LINE_LENGTH);
-        let ry = y - fy * LINE_LENGTH - MARGIN_STAGE;
+        let stagePosX = (x - this.scrollX) / this.scale;
+        let stagePosY = (y - this.scrollY) / this.scale;
+
+        let fx = Math.floor((stagePosX - MARGIN_STAGE) / LINE_LENGTH);
+        let rx = stagePosX - fx * LINE_LENGTH - MARGIN_STAGE;
+        let fy = Math.floor((stagePosY - MARGIN_STAGE) / LINE_LENGTH);
+        let ry = stagePosY - fy * LINE_LENGTH - MARGIN_STAGE;
         let isVirtical: boolean;
 
         if (rx < ry && rx + ry < LINE_LENGTH) {

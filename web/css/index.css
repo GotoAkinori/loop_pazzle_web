@@ -36,3 +36,12 @@
     stroke: black;
     stroke-width: 2px;
 }
+
+#stage text.complete {
+    font-size: 50px;
+    font-weight: 1000;
+    stroke-width: 2px;
+    stroke: white;
+    fill: #028;
+    text-anchor: middle;
+}

@@ -10,7 +10,79 @@ import("../node_modules/loop_puzzle_web/loop_puzzle_web.js").then(async (js) => 
 let stage: Stage;
 
 async function init() {
-    stage = new Stage(document.getElementById("stage") as unknown as SVGElement);
+    let stageSvg = document.getElementById("stage") as unknown as SVGElement;
+    stage = new Stage(stageSvg);
+
+    let preventClick = false;
+    stageSvg.addEventListener("click", (ev) => {
+        if (!preventClick) {
+            let stageRect = stageSvg.getBoundingClientRect();
+            stage.click(
+                ev.clientX - stageRect.left - stage.scrollX,
+                ev.clientY - stageRect.top - stage.scrollY
+            );
+        } else {
+            preventClick = false;
+        }
+    });
+    stageSvg.addEventListener("contextmenu", (ev) => {
+        if (!preventClick) {
+            ev.preventDefault();
+            let stageRect = stageSvg.getBoundingClientRect();
+            stage.rclick(
+                ev.clientX - stageRect.left - stage.scrollX,
+                ev.clientY - stageRect.top - stage.scrollY
+            );
+        } else {
+            preventClick = false;
+        }
+    });
+    document.addEventListener("keydown", (ev) => {
+        stage.onKey(ev);
+    });
+    { // scroll
+        let dragging = false;
+        let dragX = 0;
+        let dragY = 0;
+        let scrollX = 0;
+        let scrollY = 0;
+        stageSvg.addEventListener("mousedown", (ev) => {
+            dragging = true;
+            dragX = ev.clientX;
+            dragY = ev.clientY;
+            scrollX = stage.scrollX;
+            scrollY = stage.scrollY;
+        });
+        window.addEventListener("mousemove", (ev) => {
+            if (dragging) {
+                preventClick = true;
+                stage.scroll(ev.clientX - dragX + scrollX, ev.clientY - dragY + scrollY);
+            }
+        });
+        window.addEventListener("mouseup", () => {
+            dragging = false;
+        })
+    }
+    { // scale
+        let scaleList = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5];
+        let scaleIndex = 3;
+        stageSvg.addEventListener("wheel", (ev) => {
+            ev.preventDefault();
+            let deltaScale = ev.deltaY > 0 ? -1 : 1;
+
+            if (scaleIndex + deltaScale < 0 || scaleIndex + deltaScale >= scaleList.length) {
+                return;
+            }
+
+            scaleIndex = scaleIndex + deltaScale;
+
+            let stageRect = stageSvg.getBoundingClientRect();
+            let cx = ev.clientX - stageRect.left;
+            let cy = ev.clientY - stageRect.top;
+
+            stage.changeScale(scaleList[scaleIndex], cx, cy);
+        });
+    }
 
     document.getElementById("new_puzzle")!.addEventListener("click", () => {
         let width = Number((document.getElementById("stage_width") as HTMLInputElement).value);

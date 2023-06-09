@@ -417,7 +417,70 @@ Promise.resolve().then(() => __importStar(__webpack_require__(/*! ../node_module
 let stage;
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
-        stage = new stage_1.Stage(document.getElementById("stage"));
+        let stageSvg = document.getElementById("stage");
+        stage = new stage_1.Stage(stageSvg);
+        let preventClick = false;
+        stageSvg.addEventListener("click", (ev) => {
+            if (!preventClick) {
+                let stageRect = stageSvg.getBoundingClientRect();
+                stage.click(ev.clientX - stageRect.left - stage.scrollX, ev.clientY - stageRect.top - stage.scrollY);
+            }
+            else {
+                preventClick = false;
+            }
+        });
+        stageSvg.addEventListener("contextmenu", (ev) => {
+            if (!preventClick) {
+                ev.preventDefault();
+                let stageRect = stageSvg.getBoundingClientRect();
+                stage.rclick(ev.clientX - stageRect.left - stage.scrollX, ev.clientY - stageRect.top - stage.scrollY);
+            }
+            else {
+                preventClick = false;
+            }
+        });
+        document.addEventListener("keydown", (ev) => {
+            stage.onKey(ev);
+        });
+        { // scroll
+            let dragging = false;
+            let dragX = 0;
+            let dragY = 0;
+            let scrollX = 0;
+            let scrollY = 0;
+            stageSvg.addEventListener("mousedown", (ev) => {
+                dragging = true;
+                dragX = ev.clientX;
+                dragY = ev.clientY;
+                scrollX = stage.scrollX;
+                scrollY = stage.scrollY;
+            });
+            window.addEventListener("mousemove", (ev) => {
+                if (dragging) {
+                    preventClick = true;
+                    stage.scroll(ev.clientX - dragX + scrollX, ev.clientY - dragY + scrollY);
+                }
+            });
+            window.addEventListener("mouseup", () => {
+                dragging = false;
+            });
+        }
+        { // scale
+            let scaleList = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5];
+            let scaleIndex = 3;
+            stageSvg.addEventListener("wheel", (ev) => {
+                ev.preventDefault();
+                let deltaScale = ev.deltaY > 0 ? -1 : 1;
+                if (scaleIndex + deltaScale < 0 || scaleIndex + deltaScale >= scaleList.length) {
+                    return;
+                }
+                scaleIndex = scaleIndex + deltaScale;
+                let stageRect = stageSvg.getBoundingClientRect();
+                let cx = ev.clientX - stageRect.left;
+                let cy = ev.clientY - stageRect.top;
+                stage.changeScale(scaleList[scaleIndex], cx, cy);
+            });
+        }
         document.getElementById("new_puzzle").addEventListener("click", () => {
             let width = Number(document.getElementById("stage_width").value);
             let height = Number(document.getElementById("stage_height").value);
@@ -460,18 +523,18 @@ class Stage {
         this.h_line = [];
         this.width = 0;
         this.height = 0;
-        stage.addEventListener("click", (ev) => {
-            let stageRect = stage.getBoundingClientRect();
-            this.click(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
-        });
-        stage.addEventListener("contextmenu", (ev) => {
-            ev.preventDefault();
-            let stageRect = stage.getBoundingClientRect();
-            this.rclick(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
-        });
+        this.lineInfos = [];
+        this.lineInfoIndex = -1;
+        this.scrollX = 0;
+        this.scrollY = 0;
+        this.scale = 1;
+        this.puzzleLayer = document.createElementNS(NS_SVG, "g");
+        this.decorationLayer = document.createElementNS(NS_SVG, "g");
+        stage.append(this.puzzleLayer);
+        stage.append(this.decorationLayer);
     }
     init(width, height, data) {
-        this.stage.innerHTML = "";
+        this.puzzleLayer.innerHTML = "";
         this.v_line.length = 0;
         this.h_line.length = 0;
         this.width = width;
@@ -480,14 +543,14 @@ class Stage {
         for (let r = 0; r < height; r++) {
             this.v_line.push([]);
             for (let c = 0; c < width + 1; c++) {
-                this.v_line[r].push(new LineItem(this.stage, c, r, true));
+                this.v_line[r].push(new LineItem(this.puzzleLayer, c, r, true));
             }
         }
         // H lines
         for (let r = 0; r < height + 1; r++) {
             this.h_line.push([]);
             for (let c = 0; c < width; c++) {
-                this.h_line[r].push(new LineItem(this.stage, c, r, false));
+                this.h_line[r].push(new LineItem(this.puzzleLayer, c, r, false));
             }
         }
         // numbers
@@ -501,10 +564,25 @@ class Stage {
                     text.setAttribute("x", (MARGIN_STAGE + (c + 0.5) * LINE_LENGTH).toString());
                     text.setAttribute("y", (MARGIN_STAGE + (r + 0.5) * LINE_LENGTH + NUMBER_FONT_Y_ADJUST).toString());
                     text.setAttribute("text-anchor", "middle");
-                    this.stage.append(text);
+                    this.puzzleLayer.append(text);
                 }
             }
         }
+        // save number-info
+        this.numberInfo = {
+            numbers: numberStrings.map(v => {
+                let num_line = [];
+                for (let c = 0; c < width; c++) {
+                    num_line.push(v[c] == " " ? -1 : v[c].charCodeAt(0) - '0'.charCodeAt(0));
+                }
+                return num_line;
+            })
+        };
+        this.lineInfos.length = 0;
+        this.lineInfoIndex = 0;
+        this.saveLineInfo();
+        this.assist();
+        this.saveLineInfo();
     }
     getClosestLine(x, y) {
         let fx = Math.floor((x - MARGIN_STAGE) / LINE_LENGTH);
@@ -543,6 +621,11 @@ class Stage {
             else {
                 this.h_line[fy][fx].click();
             }
+            this.assist();
+            this.saveLineInfo();
+            if (this.checkCleared()) {
+                this.complete();
+            }
         }
     }
     rclick(x, y) {
@@ -554,10 +637,335 @@ class Stage {
             else {
                 this.h_line[fy][fx].rclick();
             }
+            this.assist();
+            this.saveLineInfo();
         }
+    }
+    saveLineInfo() {
+        this.lineInfos.length = this.lineInfoIndex + 1;
+        this.lineInfos.push({
+            h_line: this.h_line.map(u => u.map(v => {
+                switch (v.getLineType()) {
+                    case "line": return 1;
+                    case "x": return 0;
+                    case "none": return -1;
+                }
+            })),
+            v_line: this.v_line.map(u => u.map(v => {
+                switch (v.getLineType()) {
+                    case "line": return 1;
+                    case "x": return 0;
+                    case "none": return -1;
+                }
+            }))
+        });
+        this.lineInfoIndex++;
+    }
+    loadLineInfo(index) {
+        if (index < 0 || index >= this.lineInfos.length) {
+            return;
+        }
+        this.lineInfoIndex = index;
+        let lineInfo = this.lineInfos[this.lineInfoIndex];
+        function lineTypeToInfo(v) {
+            switch (v) {
+                case -1: return "none";
+                case 0: return "x";
+                case 1: return "line";
+                default: return "none";
+            }
+        }
+        ;
+        this.v_line.map((v, r) => v.map((v, c) => {
+            v.setLineType(lineTypeToInfo(lineInfo.v_line[r][c]));
+        }));
+        this.h_line.map((v, r) => v.map((v, c) => {
+            v.setLineType(lineTypeToInfo(lineInfo.h_line[r][c]));
+        }));
+    }
+    onKey(ev) {
+        // svg element won't be active. so insteadly check if "body is active".
+        if (document.activeElement == document.body) {
+            ev.preventDefault();
+            if (ev.ctrlKey) {
+                if (ev.code == "KeyZ") {
+                    this.loadLineInfo(this.lineInfoIndex - 1);
+                }
+                else if (ev.code == "KeyY") {
+                    this.loadLineInfo(this.lineInfoIndex + 1);
+                }
+            }
+        }
+    }
+    setDisplay() {
+        this.puzzleLayer.setAttribute("transform", `translate(${this.scrollX} ${this.scrollY}) scale(${this.scale})`);
+    }
+    scroll(x, y) {
+        this.scrollX = x;
+        this.scrollY = y;
+        this.setDisplay();
+    }
+    changeScale(scale, cx, cy) {
+        // (cx - scrollx) / scale = (cx - new_scrollx) / new_scale
+        // (cy - scrolly) / scale = (cy - new_scrolly) / new_scale
+        this.scrollX = cx - (cx - this.scrollX) * scale / this.scale;
+        this.scrollY = cy - (cy - this.scrollY) * scale / this.scale;
+        this.scale = scale;
+        this.setDisplay();
+    }
+    getNumber(r, c) {
+        var _a, _b;
+        return (_b = (_a = this.numberInfo) === null || _a === void 0 ? void 0 : _a.numbers[r][c]) !== null && _b !== void 0 ? _b : -1;
+    }
+    getVLineType(r, c) {
+        var _a;
+        if (r < 0 || r >= this.height || c < 0 || c >= this.width + 1) {
+            return "x";
+        }
+        return (_a = this.v_line[r][c].getLineType()) !== null && _a !== void 0 ? _a : -1;
+    }
+    getHLineType(r, c) {
+        var _a;
+        if (r < 0 || r >= this.height + 1 || c < 0 || c >= this.width) {
+            return "x";
+        }
+        return (_a = this.h_line[r][c].getLineType()) !== null && _a !== void 0 ? _a : -1;
+    }
+    getLineType(r, c, isVirtical) {
+        if (isVirtical) {
+            return this.getVLineType(r, c);
+        }
+        else {
+            return this.getHLineType(r, c);
+        }
+    }
+    setVLineType(r, c, type) {
+        this.v_line[r][c].setLineType(type);
+    }
+    setHLineType(r, c, type) {
+        this.h_line[r][c].setLineType(type);
+    }
+    setLineType(r, c, isVirtical, type) {
+        if (isVirtical) {
+            return this.setVLineType(r, c, type);
+        }
+        else {
+            return this.setHLineType(r, c, type);
+        }
+    }
+    *iterateAllNumbers() {
+        for (let r = 0; r < this.height; r++) {
+            for (let c = 0; c < this.width; c++) {
+                yield [r, c];
+            }
+        }
+    }
+    *iterateAllPoints() {
+        for (let r = 0; r < this.height + 1; r++) {
+            for (let c = 0; c < this.width + 1; c++) {
+                yield [r, c];
+            }
+        }
+    }
+    *iterateAllLines() {
+        for (let r = 0; r < this.height; r++) {
+            for (let c = 0; c < this.width + 1; c++) {
+                yield [r, c, true];
+            }
+        }
+        for (let r = 0; r < this.height + 1; r++) {
+            for (let c = 0; c < this.width; c++) {
+                yield [r, c, false];
+            }
+        }
+    }
+    assist() {
+        let changed = false;
+        while (true) {
+            changed = false;
+            // numbers
+            for (let [r, c] of this.iterateAllNumbers()) {
+                let num = this.getNumber(r, c);
+                if (num >= 0) {
+                    let countLine = 0;
+                    let countNoLine = 0;
+                    for (let [dr, dc, isVirtical] of Stage.lineArroundNumber) {
+                        if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
+                            countLine++;
+                        }
+                        else if (this.getLineType(r + dr, c + dc, isVirtical) == "x") {
+                            countNoLine++;
+                        }
+                    }
+                    if (countLine + countNoLine == 4) {
+                        continue;
+                    }
+                    else if (countLine == num) {
+                        for (let [dr, dc, isVirtical] of Stage.lineArroundNumber) {
+                            if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
+                                this.setLineType(r + dr, c + dc, isVirtical, "x");
+                            }
+                        }
+                        changed = true;
+                    }
+                    else if (countNoLine + num == 4) {
+                        for (let [dr, dc, isVirtical] of Stage.lineArroundNumber) {
+                            if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
+                                this.setLineType(r + dr, c + dc, isVirtical, "line");
+                            }
+                        }
+                        changed = true;
+                    }
+                }
+            }
+            // points
+            for (let [r, c] of this.iterateAllPoints()) {
+                let countLine = 0;
+                let countNoLine = 0;
+                for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
+                    if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
+                        countLine++;
+                    }
+                    else if (this.getLineType(r + dr, c + dc, isVirtical) == "x") {
+                        countNoLine++;
+                    }
+                }
+                if (countLine + countNoLine == 4) {
+                    continue;
+                }
+                else if (countLine == 2 || countNoLine == 3) {
+                    for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
+                        if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
+                            this.setLineType(r + dr, c + dc, isVirtical, "x");
+                        }
+                    }
+                    changed = true;
+                }
+                else if (countNoLine == 2 && countLine == 1) {
+                    for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
+                        if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
+                            this.setLineType(r + dr, c + dc, isVirtical, "line");
+                        }
+                    }
+                    changed = true;
+                }
+            }
+            if (!changed) {
+                break;
+            }
+        }
+    }
+    checkCleared() {
+        // check number
+        {
+            for (let [r, c] of this.iterateAllNumbers()) {
+                let num = this.getNumber(r, c);
+                if (num >= 0) {
+                    let countLine = 0;
+                    for (let [dr, dc, isVirtical] of Stage.lineArroundNumber) {
+                        if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
+                            countLine++;
+                        }
+                    }
+                    if (num != countLine) {
+                        return false;
+                    }
+                }
+            }
+        }
+        // check points
+        {
+            for (let [r, c] of this.iterateAllNumbers()) {
+                let countLine = 0;
+                for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
+                    if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
+                        countLine++;
+                    }
+                }
+                if (countLine == 1 || countLine == 3 || countLine == 4) {
+                    return false;
+                }
+            }
+        }
+        // check global loop
+        {
+            let groupPoints = [];
+            let joinGroup = (num1, num2) => {
+                if (num1 == num2) {
+                    return;
+                }
+                for (let [r, c] of this.iterateAllPoints()) {
+                    if (groupPoints[r][c] == num2) {
+                        groupPoints[r][c] = num1;
+                    }
+                }
+            };
+            for (let r = 0; r < this.height + 1; r++) {
+                groupPoints.push([]);
+                for (let c = 0; c < this.width + 1; c++) {
+                    groupPoints[r].push(-1);
+                }
+            }
+            for (let [r, c] of this.iterateAllPoints()) {
+                let countLine = 0;
+                for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
+                    if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
+                        countLine++;
+                    }
+                }
+                if (countLine == 0) {
+                    groupPoints[r][c] = -1;
+                }
+                else if (countLine == 2) {
+                    groupPoints[r][c] = r * (this.width + 1) + c;
+                }
+            }
+            for (let [r, c, isVirtical] of this.iterateAllLines()) {
+                if (this.getLineType(r, c, isVirtical) == "line") {
+                    if (isVirtical) {
+                        joinGroup(groupPoints[r][c], groupPoints[r + 1][c]);
+                    }
+                    else {
+                        joinGroup(groupPoints[r][c], groupPoints[r][c + 1]);
+                    }
+                }
+            }
+            let group = -1;
+            for (let [r, c] of this.iterateAllPoints()) {
+                if (groupPoints[r][c] == -1 || groupPoints[r][c] == group) {
+                    continue;
+                }
+                else if (group == -1) {
+                    group = groupPoints[r][c];
+                    continue;
+                }
+                else {
+                    return false;
+                }
+            }
+            if (group == -1) {
+                return false;
+            }
+        }
+        return true;
+    }
+    complete() {
+        if (this.completeText) {
+            this.completeText.remove();
+        }
+        this.completeText = document.createElementNS(NS_SVG, "text");
+        let stageRect = this.stage.getBoundingClientRect();
+        this.completeText.innerHTML = "COMPLETE";
+        this.completeText.setAttribute("x", (stageRect.width / 2).toString());
+        this.completeText.setAttribute("y", (stageRect.height / 2).toString());
+        this.completeText.setAttribute("transform", `rotate(-30 ${stageRect.width / 2}, ${stageRect.height / 2})`);
+        this.completeText.classList.add("complete");
+        this.decorationLayer.append(this.completeText);
     }
 }
 exports.Stage = Stage;
+Stage.lineArroundNumber = [[0, 0, true], [0, 0, false], [0, 1, true], [1, 0, false]];
+Stage.lineArroundPoint = [[0, 0, true], [0, 0, false], [-1, 0, true], [0, -1, false]];
 class LineItem {
     constructor(stage, x, y, isVirtical) {
         this.stage = stage;
@@ -602,6 +1010,13 @@ class LineItem {
         this.line.classList.remove("line");
         this.line.classList.remove("x");
         this.line.classList.add(this.type);
+    }
+    getLineType() {
+        return this.type;
+    }
+    setLineType(type) {
+        this.type = type;
+        this.redraw();
     }
 }
 exports.LineItem = LineItem;

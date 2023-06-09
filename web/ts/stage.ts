@@ -13,7 +13,7 @@ export class Stage {
 
     private numberInfo?: StageNumberInfo;
     private lineInfos: StageLineInfo[] = [];
-    private lineInfoIndex: number = -1;
+    public lineInfoIndex: number = -1;
 
     private static lineArroundNumber: [number, number, boolean][] = [[0, 0, true], [0, 0, false], [0, 1, true], [1, 0, false]];
     private static lineArroundPoint: [number, number, boolean][] = [[0, 0, true], [0, 0, false], [-1, 0, true], [0, -1, false]];
@@ -27,6 +27,7 @@ export class Stage {
         stage.append(this.puzzleLayer);
         stage.append(this.decorationLayer);
     }
+
     public init(width: number, height: number, data: string) {
         this.puzzleLayer.innerHTML = "";
         this.decorationLayer.innerHTML = "";
@@ -165,14 +166,14 @@ export class Stage {
             h_line: this.h_line.map(u => u.map(v => {
                 switch (v.getLineType()) {
                     case "line": return 1;
-                    case "x": return 0;
+                    case "no-line": return 0;
                     case "none": return -1;
                 }
             })),
             v_line: this.v_line.map(u => u.map(v => {
                 switch (v.getLineType()) {
                     case "line": return 1;
-                    case "x": return 0;
+                    case "no-line": return 0;
                     case "none": return -1;
                 }
             }))
@@ -191,7 +192,7 @@ export class Stage {
         function lineTypeToInfo(v: number) {
             switch (v) {
                 case -1: return "none";
-                case 0: return "x";
+                case 0: return "no-line";
                 case 1: return "line";
                 default: return "none";
             }
@@ -203,20 +204,6 @@ export class Stage {
         this.h_line.map((v, r) => v.map((v, c) => {
             v.setLineType(lineTypeToInfo(lineInfo.h_line[r][c]));
         }));
-    }
-
-    public onKey(ev: KeyboardEvent) {
-        // svg element won't be active. so insteadly check if "body is active".
-        if (document.activeElement == document.body) {
-            ev.preventDefault();
-            if (ev.ctrlKey) {
-                if (ev.code == "KeyZ") {
-                    this.loadLineInfo(this.lineInfoIndex - 1);
-                } else if (ev.code == "KeyY") {
-                    this.loadLineInfo(this.lineInfoIndex + 1);
-                }
-            }
-        }
     }
 
     public scrollX: number = 0;
@@ -233,12 +220,28 @@ export class Stage {
     }
 
     public changeScale(scale: number, cx: number, cy: number) {
-        // (cx - scrollx) / scale = (cx - new_scrollx) / new_scale
-        // (cy - scrolly) / scale = (cy - new_scrolly) / new_scale
         this.scrollX = cx - (cx - this.scrollX) * scale / this.scale;
         this.scrollY = cy - (cy - this.scrollY) * scale / this.scale;
         this.scale = scale;
         this.setDisplay();
+    }
+
+    private static scaleList = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5];
+    private scaleIndex = 3;
+    public scaleUp(cx: number, cy: number) {
+        if (this.scaleIndex + 1 >= Stage.scaleList.length) {
+            return;
+        }
+        this.scaleIndex += 1;
+        this.changeScale(Stage.scaleList[this.scaleIndex], cx, cy);
+    }
+
+    public scaleDown(cx: number, cy: number) {
+        if (this.scaleIndex - 1 < 0) {
+            return;
+        }
+        this.scaleIndex -= 1;
+        this.changeScale(Stage.scaleList[this.scaleIndex], cx, cy);
     }
 
     private getNumber(r: number, c: number) {
@@ -246,13 +249,13 @@ export class Stage {
     }
     private getVLineType(r: number, c: number) {
         if (r < 0 || r >= this.height || c < 0 || c >= this.width + 1) {
-            return "x";
+            return "no-line";
         }
         return this.v_line[r][c].getLineType() ?? -1;
     }
     private getHLineType(r: number, c: number) {
         if (r < 0 || r >= this.height + 1 || c < 0 || c >= this.width) {
-            return "x";
+            return "no-line";
         }
         return this.h_line[r][c].getLineType() ?? -1;
     }
@@ -263,13 +266,13 @@ export class Stage {
             return this.getHLineType(r, c);
         }
     }
-    private setVLineType(r: number, c: number, type: "none" | "x" | "line") {
+    private setVLineType(r: number, c: number, type: "none" | "no-line" | "line") {
         this.v_line[r][c].setLineType(type);
     }
-    private setHLineType(r: number, c: number, type: "none" | "x" | "line") {
+    private setHLineType(r: number, c: number, type: "none" | "no-line" | "line") {
         this.h_line[r][c].setLineType(type);
     }
-    private setLineType(r: number, c: number, isVirtical: boolean, type: "none" | "x" | "line") {
+    private setLineType(r: number, c: number, isVirtical: boolean, type: "none" | "no-line" | "line") {
         if (isVirtical) {
             return this.setVLineType(r, c, type);
         } else {
@@ -319,7 +322,7 @@ export class Stage {
                     for (let [dr, dc, isVirtical] of Stage.lineArroundNumber) {
                         if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
                             countLine++;
-                        } else if (this.getLineType(r + dr, c + dc, isVirtical) == "x") {
+                        } else if (this.getLineType(r + dr, c + dc, isVirtical) == "no-line") {
                             countNoLine++;
                         }
                     }
@@ -329,7 +332,7 @@ export class Stage {
                     } else if (countLine == num) {
                         for (let [dr, dc, isVirtical] of Stage.lineArroundNumber) {
                             if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
-                                this.setLineType(r + dr, c + dc, isVirtical, "x");
+                                this.setLineType(r + dr, c + dc, isVirtical, "no-line");
                             }
                         }
                         changed = true;
@@ -351,7 +354,7 @@ export class Stage {
                 for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
                     if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
                         countLine++;
-                    } else if (this.getLineType(r + dr, c + dc, isVirtical) == "x") {
+                    } else if (this.getLineType(r + dr, c + dc, isVirtical) == "no-line") {
                         countNoLine++;
                     }
                 }
@@ -361,7 +364,7 @@ export class Stage {
                 } else if (countLine == 2 || countNoLine == 3) {
                     for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
                         if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
-                            this.setLineType(r + dr, c + dc, isVirtical, "x");
+                            this.setLineType(r + dr, c + dc, isVirtical, "no-line");
                         }
                     }
                     changed = true;
@@ -497,7 +500,7 @@ export class Stage {
 }
 
 export class LineItem {
-    public type: "none" | "x" | "line" = "none";
+    public type: "none" | "no-line" | "line" = "none";
     public line: SVGLineElement;
 
     public constructor(public stage: SVGElement, x: number, y: number, public isVirtical: boolean) {
@@ -527,10 +530,10 @@ export class LineItem {
         this.redraw();
     }
     public rclick() {
-        if (this.type == "x") {
+        if (this.type == "no-line") {
             this.type = "none";
         } else {
-            this.type = "x";
+            this.type = "no-line";
         }
 
         this.redraw();
@@ -539,14 +542,14 @@ export class LineItem {
     public redraw() {
         this.line.classList.remove("none");
         this.line.classList.remove("line");
-        this.line.classList.remove("x");
+        this.line.classList.remove("no-line");
         this.line.classList.add(this.type);
     }
 
     public getLineType() {
         return this.type;
     }
-    public setLineType(type: "none" | "x" | "line") {
+    public setLineType(type: "none" | "no-line" | "line") {
         this.type = type;
         this.redraw();
     }

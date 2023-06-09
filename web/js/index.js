@@ -440,7 +440,18 @@ function init() {
             }
         });
         document.addEventListener("keydown", (ev) => {
-            stage.onKey(ev);
+            // svg element won't be active. so insteadly check if "body is active".
+            if (document.activeElement == document.body) {
+                ev.preventDefault();
+                if (ev.ctrlKey) {
+                    if (ev.code == "KeyZ") {
+                        stage.loadLineInfo(stage.lineInfoIndex - 1);
+                    }
+                    else if (ev.code == "KeyY") {
+                        stage.loadLineInfo(stage.lineInfoIndex + 1);
+                    }
+                }
+            }
         });
         { // scroll
             let dragging = false;
@@ -466,19 +477,17 @@ function init() {
             });
         }
         { // scale
-            let scaleList = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5];
-            let scaleIndex = 3;
             stageSvg.addEventListener("wheel", (ev) => {
                 ev.preventDefault();
-                let deltaScale = ev.deltaY > 0 ? -1 : 1;
-                if (scaleIndex + deltaScale < 0 || scaleIndex + deltaScale >= scaleList.length) {
-                    return;
-                }
-                scaleIndex = scaleIndex + deltaScale;
                 let stageRect = stageSvg.getBoundingClientRect();
                 let cx = ev.clientX - stageRect.left;
                 let cy = ev.clientY - stageRect.top;
-                stage.changeScale(scaleList[scaleIndex], cx, cy);
+                if (ev.deltaY > 0) {
+                    stage.scaleUp(cx, cy);
+                }
+                else {
+                    stage.scaleDown(cx, cy);
+                }
             });
         }
         document.getElementById("new_puzzle").addEventListener("click", () => {
@@ -486,6 +495,12 @@ function init() {
             let height = Number(document.getElementById("stage_height").value);
             let puzzle_string = make_puzzle_web2(height, width);
             stage.init(width, height, puzzle_string);
+        });
+        document.getElementById("undo").addEventListener("click", () => {
+            stage.loadLineInfo(stage.lineInfoIndex - 1);
+        });
+        document.getElementById("redo").addEventListener("click", () => {
+            stage.loadLineInfo(stage.lineInfoIndex + 1);
         });
     });
 }
@@ -528,6 +543,7 @@ class Stage {
         this.scrollX = 0;
         this.scrollY = 0;
         this.scale = 1;
+        this.scaleIndex = 3;
         this.puzzleLayer = document.createElementNS(NS_SVG, "g");
         this.decorationLayer = document.createElementNS(NS_SVG, "g");
         stage.append(this.puzzleLayer);
@@ -650,14 +666,14 @@ class Stage {
             h_line: this.h_line.map(u => u.map(v => {
                 switch (v.getLineType()) {
                     case "line": return 1;
-                    case "x": return 0;
+                    case "no-line": return 0;
                     case "none": return -1;
                 }
             })),
             v_line: this.v_line.map(u => u.map(v => {
                 switch (v.getLineType()) {
                     case "line": return 1;
-                    case "x": return 0;
+                    case "no-line": return 0;
                     case "none": return -1;
                 }
             }))
@@ -673,7 +689,7 @@ class Stage {
         function lineTypeToInfo(v) {
             switch (v) {
                 case -1: return "none";
-                case 0: return "x";
+                case 0: return "no-line";
                 case 1: return "line";
                 default: return "none";
             }
@@ -686,20 +702,6 @@ class Stage {
             v.setLineType(lineTypeToInfo(lineInfo.h_line[r][c]));
         }));
     }
-    onKey(ev) {
-        // svg element won't be active. so insteadly check if "body is active".
-        if (document.activeElement == document.body) {
-            ev.preventDefault();
-            if (ev.ctrlKey) {
-                if (ev.code == "KeyZ") {
-                    this.loadLineInfo(this.lineInfoIndex - 1);
-                }
-                else if (ev.code == "KeyY") {
-                    this.loadLineInfo(this.lineInfoIndex + 1);
-                }
-            }
-        }
-    }
     setDisplay() {
         this.puzzleLayer.setAttribute("transform", `translate(${this.scrollX} ${this.scrollY}) scale(${this.scale})`);
     }
@@ -709,12 +711,24 @@ class Stage {
         this.setDisplay();
     }
     changeScale(scale, cx, cy) {
-        // (cx - scrollx) / scale = (cx - new_scrollx) / new_scale
-        // (cy - scrolly) / scale = (cy - new_scrolly) / new_scale
         this.scrollX = cx - (cx - this.scrollX) * scale / this.scale;
         this.scrollY = cy - (cy - this.scrollY) * scale / this.scale;
         this.scale = scale;
         this.setDisplay();
+    }
+    scaleUp(cx, cy) {
+        if (this.scaleIndex + 1 >= Stage.scaleList.length) {
+            return;
+        }
+        this.scaleIndex += 1;
+        this.changeScale(Stage.scaleList[this.scaleIndex], cx, cy);
+    }
+    scaleDown(cx, cy) {
+        if (this.scaleIndex - 1 < 0) {
+            return;
+        }
+        this.scaleIndex -= 1;
+        this.changeScale(Stage.scaleList[this.scaleIndex], cx, cy);
     }
     getNumber(r, c) {
         var _a, _b;
@@ -723,14 +737,14 @@ class Stage {
     getVLineType(r, c) {
         var _a;
         if (r < 0 || r >= this.height || c < 0 || c >= this.width + 1) {
-            return "x";
+            return "no-line";
         }
         return (_a = this.v_line[r][c].getLineType()) !== null && _a !== void 0 ? _a : -1;
     }
     getHLineType(r, c) {
         var _a;
         if (r < 0 || r >= this.height + 1 || c < 0 || c >= this.width) {
-            return "x";
+            return "no-line";
         }
         return (_a = this.h_line[r][c].getLineType()) !== null && _a !== void 0 ? _a : -1;
     }
@@ -796,7 +810,7 @@ class Stage {
                         if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
                             countLine++;
                         }
-                        else if (this.getLineType(r + dr, c + dc, isVirtical) == "x") {
+                        else if (this.getLineType(r + dr, c + dc, isVirtical) == "no-line") {
                             countNoLine++;
                         }
                     }
@@ -806,7 +820,7 @@ class Stage {
                     else if (countLine == num) {
                         for (let [dr, dc, isVirtical] of Stage.lineArroundNumber) {
                             if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
-                                this.setLineType(r + dr, c + dc, isVirtical, "x");
+                                this.setLineType(r + dr, c + dc, isVirtical, "no-line");
                             }
                         }
                         changed = true;
@@ -829,7 +843,7 @@ class Stage {
                     if (this.getLineType(r + dr, c + dc, isVirtical) == "line") {
                         countLine++;
                     }
-                    else if (this.getLineType(r + dr, c + dc, isVirtical) == "x") {
+                    else if (this.getLineType(r + dr, c + dc, isVirtical) == "no-line") {
                         countNoLine++;
                     }
                 }
@@ -839,7 +853,7 @@ class Stage {
                 else if (countLine == 2 || countNoLine == 3) {
                     for (let [dr, dc, isVirtical] of Stage.lineArroundPoint) {
                         if (this.getLineType(r + dr, c + dc, isVirtical) == "none") {
-                            this.setLineType(r + dr, c + dc, isVirtical, "x");
+                            this.setLineType(r + dr, c + dc, isVirtical, "no-line");
                         }
                     }
                     changed = true;
@@ -969,6 +983,7 @@ class Stage {
 exports.Stage = Stage;
 Stage.lineArroundNumber = [[0, 0, true], [0, 0, false], [0, 1, true], [1, 0, false]];
 Stage.lineArroundPoint = [[0, 0, true], [0, 0, false], [-1, 0, true], [0, -1, false]];
+Stage.scaleList = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5];
 class LineItem {
     constructor(stage, x, y, isVirtical) {
         this.stage = stage;
@@ -1000,18 +1015,18 @@ class LineItem {
         this.redraw();
     }
     rclick() {
-        if (this.type == "x") {
+        if (this.type == "no-line") {
             this.type = "none";
         }
         else {
-            this.type = "x";
+            this.type = "no-line";
         }
         this.redraw();
     }
     redraw() {
         this.line.classList.remove("none");
         this.line.classList.remove("line");
-        this.line.classList.remove("x");
+        this.line.classList.remove("no-line");
         this.line.classList.add(this.type);
     }
     getLineType() {

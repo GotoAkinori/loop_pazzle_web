@@ -29,7 +29,7 @@
     stroke-dasharray: 3px;
 }
 
-#stage line.x {
+#stage line.no-line {
     fill: none;
     stroke: none;
 }
@@ -46,4 +46,16 @@
     stroke: white;
     fill: #028;
     text-anchor: middle;
+}
+
+.command_button {
+    width: 50px;
+    height: 20px;
+    border: 1px solid #88F;
+    background-color: #AAF;
+    color: black;
+}
+
+.command_button:hover {
+    background-color: #88F;
 }

@@ -25,6 +25,7 @@ async function init() {
             preventClick = false;
         }
     });
+
     stageSvg.addEventListener("contextmenu", (ev) => {
         ev.preventDefault();
         if (!preventClick) {
@@ -37,9 +38,21 @@ async function init() {
             preventClick = false;
         }
     });
+
     document.addEventListener("keydown", (ev) => {
-        stage.onKey(ev);
+        // svg element won't be active. so insteadly check if "body is active".
+        if (document.activeElement == document.body) {
+            ev.preventDefault();
+            if (ev.ctrlKey) {
+                if (ev.code == "KeyZ") {
+                    stage.loadLineInfo(stage.lineInfoIndex - 1);
+                } else if (ev.code == "KeyY") {
+                    stage.loadLineInfo(stage.lineInfoIndex + 1);
+                }
+            }
+        }
     });
+
     { // scroll
         let dragging = false;
         let dragX = 0;
@@ -63,24 +76,19 @@ async function init() {
             dragging = false;
         })
     }
+
     { // scale
-        let scaleList = [0.25, 0.5, 0.75, 1, 1.5, 2, 3, 5];
-        let scaleIndex = 3;
         stageSvg.addEventListener("wheel", (ev) => {
             ev.preventDefault();
-            let deltaScale = ev.deltaY > 0 ? -1 : 1;
-
-            if (scaleIndex + deltaScale < 0 || scaleIndex + deltaScale >= scaleList.length) {
-                return;
-            }
-
-            scaleIndex = scaleIndex + deltaScale;
-
             let stageRect = stageSvg.getBoundingClientRect();
             let cx = ev.clientX - stageRect.left;
             let cy = ev.clientY - stageRect.top;
 
-            stage.changeScale(scaleList[scaleIndex], cx, cy);
+            if (ev.deltaY > 0) {
+                stage.scaleUp(cx, cy);
+            } else {
+                stage.scaleDown(cx, cy);
+            }
         });
     }
 
@@ -91,6 +99,12 @@ async function init() {
         let puzzle_string = make_puzzle_web2(height, width);
 
         stage.init(width, height, puzzle_string);
+    });
+    document.getElementById("undo")!.addEventListener("click", () => {
+        stage.loadLineInfo(stage.lineInfoIndex - 1);
+    });
+    document.getElementById("redo")!.addEventListener("click", () => {
+        stage.loadLineInfo(stage.lineInfoIndex + 1);
     });
 }
 

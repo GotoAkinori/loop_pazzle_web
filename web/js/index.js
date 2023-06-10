@@ -516,6 +516,7 @@ function init() {
                 // reset previous distance of 2 pointers
                 gestureStarted = false;
             }
+            document.body.addEventListener("touchmove", (ev) => ev.preventDefault());
             stageSvg.addEventListener("pointerout", pointerRemove);
             stageSvg.addEventListener("pointerup", pointerRemove);
             stageSvg.addEventListener("pointercancel", pointerRemove);
@@ -525,7 +526,6 @@ function init() {
                     preventClick = false;
                 }
             });
-            stageSvg.addEventListener("touchmove", (ev) => ev.preventDefault());
             stageSvg.addEventListener("pointermove", (ev) => {
                 // update pointer
                 let pointerIndex = pointers.findIndex(v => v.pointerId == ev.pointerId);

@@ -525,6 +525,7 @@ function init() {
                     preventClick = false;
                 }
             });
+            stageSvg.addEventListener("touchmove", (ev) => ev.preventDefault());
             stageSvg.addEventListener("pointermove", (ev) => {
                 // update pointer
                 let pointerIndex = pointers.findIndex(v => v.pointerId == ev.pointerId);

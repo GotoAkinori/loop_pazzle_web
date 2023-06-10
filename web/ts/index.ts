@@ -11,16 +11,26 @@ let stage: Stage;
 
 async function init() {
     let stageSvg = document.getElementById("stage") as unknown as SVGElement;
+    let uiOptionForm = document.getElementById("ui-option") as HTMLFormElement;
+
     stage = new Stage(stageSvg);
 
     let preventClick = false;
     stageSvg.addEventListener("click", (ev) => {
         if (!preventClick) {
             let stageRect = stageSvg.getBoundingClientRect();
-            stage.click(
-                ev.clientX - stageRect.left,
-                ev.clientY - stageRect.top
-            );
+
+            if (uiOptionForm["line-noline"].value == "line") {
+                stage.click(
+                    ev.clientX - stageRect.left,
+                    ev.clientY - stageRect.top
+                );
+            } else {
+                stage.rclick(
+                    ev.clientX - stageRect.left,
+                    ev.clientY - stageRect.top
+                );
+            }
         } else {
             preventClick = false;
         }
@@ -30,10 +40,17 @@ async function init() {
         ev.preventDefault();
         if (!preventClick) {
             let stageRect = stageSvg.getBoundingClientRect();
-            stage.rclick(
-                ev.clientX - stageRect.left,
-                ev.clientY - stageRect.top
-            );
+            if (uiOptionForm["line-noline"].value == "line") {
+                stage.rclick(
+                    ev.clientX - stageRect.left,
+                    ev.clientY - stageRect.top
+                );
+            } else {
+                stage.click(
+                    ev.clientX - stageRect.left,
+                    ev.clientY - stageRect.top
+                );
+            }
         } else {
             preventClick = false;
         }

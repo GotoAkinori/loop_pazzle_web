@@ -418,12 +418,18 @@ let stage;
 function init() {
     return __awaiter(this, void 0, void 0, function* () {
         let stageSvg = document.getElementById("stage");
+        let uiOptionForm = document.getElementById("ui-option");
         stage = new stage_1.Stage(stageSvg);
         let preventClick = false;
         stageSvg.addEventListener("click", (ev) => {
             if (!preventClick) {
                 let stageRect = stageSvg.getBoundingClientRect();
-                stage.click(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
+                if (uiOptionForm["line-noline"].value == "line") {
+                    stage.click(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
+                }
+                else {
+                    stage.rclick(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
+                }
             }
             else {
                 preventClick = false;
@@ -433,7 +439,12 @@ function init() {
             ev.preventDefault();
             if (!preventClick) {
                 let stageRect = stageSvg.getBoundingClientRect();
-                stage.rclick(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
+                if (uiOptionForm["line-noline"].value == "line") {
+                    stage.rclick(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
+                }
+                else {
+                    stage.click(ev.clientX - stageRect.left, ev.clientY - stageRect.top);
+                }
             }
             else {
                 preventClick = false;

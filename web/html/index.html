@@ -30,9 +30,52 @@
           value="10" /></label
       >]<br />
       <button class="command_button" id="new_puzzle">New</button>
-      <button class="command_button" id="undo">Undo</button>
-      <button class="command_button" id="redo">Redo</button>
     </div>
     <svg id="stage"></svg>
+    <button class="command_button" id="undo">Undo</button>
+    <button class="command_button" id="redo">Redo</button>
+    <form id="ui-option">
+      <table>
+        <tr>
+          <td>
+            <input
+              id="radio-line"
+              type="radio"
+              name="line-noline"
+              value="line"
+              checked
+            />
+          </td>
+          <td>
+            <label for="radio-line"> [Left click / Tap] - Draw line. </label>
+          </td>
+          <td>
+            <label for="radio-line">
+              [Right click / Hold] - Mark no line.
+            </label>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input
+              id="radio-noline"
+              type="radio"
+              name="line-noline"
+              value="noline"
+            />
+          </td>
+          <td>
+            <label for="radio-noline">
+              [Left click / Tap] - Mark no line.
+            </label>
+          </td>
+          <td>
+            <label for="radio-noline">
+              [Right click / Hold] - Draw line.
+            </label>
+          </td>
+        </tr>
+      </table>
+    </form>
   </body>
 </html>

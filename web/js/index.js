@@ -516,7 +516,12 @@ function init() {
                 // reset previous distance of 2 pointers
                 gestureStarted = false;
             }
-            document.body.addEventListener("touchmove", (ev) => ev.preventDefault());
+            // prevent default event (pinch operation)
+            document.body.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
             stageSvg.addEventListener("pointerout", pointerRemove);
             stageSvg.addEventListener("pointerup", pointerRemove);
             stageSvg.addEventListener("pointercancel", pointerRemove);

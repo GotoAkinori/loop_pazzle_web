@@ -142,6 +142,7 @@ async function init() {
             }
 
             if (pointers.length >= 2) {
+                ev.preventDefault();
                 let currCX = (pointers[0].clientX + pointers[1].clientX) / 2;
                 let currCY = (pointers[0].clientY + pointers[1].clientY) / 2;
                 let currDist = getDistance();

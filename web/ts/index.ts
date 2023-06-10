@@ -39,26 +39,33 @@ async function init() {
         }
     });
 
-    document.addEventListener("keydown", (ev) => {
-        // svg element won't be active. so insteadly check if "body is active".
-        if (document.activeElement == document.body) {
-            ev.preventDefault();
-            if (ev.ctrlKey) {
-                if (ev.code == "KeyZ") {
-                    stage.loadLineInfo(stage.lineInfoIndex - 1);
-                } else if (ev.code == "KeyY") {
-                    stage.loadLineInfo(stage.lineInfoIndex + 1);
+    // PC
+    {
+        document.addEventListener("keydown", (ev) => {
+            // svg element won't be active. so insteadly check if "body is active".
+            if (document.activeElement == document.body) {
+                if (ev.ctrlKey) {
+                    switch (ev.code) {
+                        case "KeyZ": {
+                            stage.loadLineInfo(stage.lineInfoIndex - 1);
+                            ev.preventDefault();
+                        }
+                        case "KeyY": {
+                            stage.loadLineInfo(stage.lineInfoIndex - 1);
+                            ev.preventDefault();
+                        }
+                    }
                 }
             }
-        }
-    });
+        });
 
-    { // scroll
         let dragging = false;
         let dragX = 0;
         let dragY = 0;
         let scrollX = 0;
         let scrollY = 0;
+
+        // scroll
         stageSvg.addEventListener("mousedown", (ev) => {
             dragging = true;
             dragX = ev.clientX;
@@ -74,10 +81,9 @@ async function init() {
         });
         window.addEventListener("mouseup", () => {
             dragging = false;
-        })
-    }
+        });
 
-    { // scale
+        // scale
         stageSvg.addEventListener("wheel", (ev) => {
             ev.preventDefault();
             let stageRect = stageSvg.getBoundingClientRect();
@@ -88,6 +94,93 @@ async function init() {
                 stage.scaleUp(cx, cy);
             } else {
                 stage.scaleDown(cx, cy);
+            }
+        });
+    }
+
+    { // Mobile
+        let prevCX = -1;
+        let prevCY = -1;
+        let prevDist = -1;
+        let initDist = -1;
+        const scaleInterval = 20;
+        let gestureStarted = false;
+        let pointers: PointerEvent[] = [];
+
+        function getDistance() {
+            return Math.sqrt(
+                (pointers[0].clientX - pointers[1].clientX) * (pointers[0].clientX - pointers[1].clientX) +
+                (pointers[0].clientY - pointers[1].clientY) * (pointers[0].clientY - pointers[1].clientY)
+            );
+        }
+
+        // scale
+        function pointerRemove(ev: PointerEvent) {
+            // remove pointer
+            let pointerIndex = pointers.findIndex(v => v.pointerId == ev.pointerId);
+            if (pointerIndex != -1) {
+                pointers.splice(pointerIndex, 1);
+            }
+
+            // reset previous distance of 2 pointers
+            gestureStarted = false;
+        }
+        stageSvg.addEventListener("pointerout", pointerRemove);
+        stageSvg.addEventListener("pointerup", pointerRemove);
+        stageSvg.addEventListener("pointercancel", pointerRemove);
+        stageSvg.addEventListener("pointerdown", (ev) => {
+            pointers.push(ev);
+            if (pointers.length >= 2) {
+                preventClick = false;
+            }
+        });
+        stageSvg.addEventListener("pointermove", (ev) => {
+            // update pointer
+            let pointerIndex = pointers.findIndex(v => v.pointerId == ev.pointerId);
+            if (pointerIndex != -1) {
+                pointers[pointerIndex] = ev;
+            }
+
+            if (pointers.length >= 2) {
+                let currCX = (pointers[0].clientX + pointers[1].clientX) / 2;
+                let currCY = (pointers[0].clientY + pointers[1].clientY) / 2;
+                let currDist = getDistance();
+                let prevScaleIndex = Math.floor((prevDist - initDist) / scaleInterval);
+                let currScaleIndex = Math.floor((currDist - initDist) / scaleInterval);
+
+                // pinch out / pinch in
+                if (!gestureStarted) {
+                    gestureStarted = true;
+                } else {
+                    // scale
+                    if (
+                        currScaleIndex > prevScaleIndex
+                    ) {
+                        // scale up
+                        for (let i = 0; i < currScaleIndex - prevScaleIndex; i++) {
+                            stage.scaleUp(currCX, currCY);
+                        }
+                    } else if (
+                        currScaleIndex < prevScaleIndex
+                    ) {
+                        // scale down
+                        for (let i = 0; i < prevScaleIndex - currScaleIndex; i++) {
+                            stage.scaleDown(currCX, currCY);
+                        }
+                    }
+
+                    // move
+                    if (currCX != prevCX || currCY != prevCY) {
+                        stage.scroll(stage.scrollX + currCX - prevCX, stage.scrollY + currCY - prevCY);
+                    }
+                }
+                prevCX = currCX;
+                prevCY = currCY;
+                prevDist = currDist;
+                preventClick = true;
+            } else {
+                gestureStarted = false;
+                preventClick = false;
             }
         });
     }

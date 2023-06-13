@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+    <defs>
+        <style>
+            .b {
+                fill: black;
+            }
+
+            .w {
+                fill: white;
+            }
+        </style>
+    </defs>
+    <g>
+        <circle class="b" cx="24" cy="24" r="20" />
+        <circle class="w" cx="26" cy="26" r="16" />
+        <path class="b" d="M 12 26 S 22 12 39 31 V 21 S 22 40 12 26 Z" />
+        <circle class="w" cx="16" cy="26" r="1" />
+    </g>
+</svg>

@@ -213,6 +213,14 @@ export class Stage {
         this.puzzleLayer.setAttribute("transform", `translate(${this.scrollX} ${this.scrollY}) scale(${this.scale})`);
     }
 
+    public resetView() {
+        this.scrollX = 0;
+        this.scrollY = 0;
+        this.scale = 1;
+        this.scaleIndex = 3;
+        this.setDisplay();
+    }
+
     public scroll(x: number, y: number) {
         this.scrollX = x;
         this.scrollY = y;

@@ -505,7 +505,7 @@ function init() {
                 let stageRect = stageSvg.getBoundingClientRect();
                 let cx = ev.clientX - stageRect.left;
                 let cy = ev.clientY - stageRect.top;
-                if (ev.deltaY > 0) {
+                if (ev.deltaY < 0) {
                     stage.scaleUp(cx, cy);
                 }
                 else {
@@ -607,6 +607,7 @@ function init() {
             let height = Number(document.getElementById("stage_height").value);
             let puzzle_string = make_puzzle_web2(height, width);
             stage.init(width, height, puzzle_string);
+            stage.resetView();
         });
         document.getElementById("undo").addEventListener("click", () => {
             stage.loadLineInfo(stage.lineInfoIndex - 1);
@@ -816,6 +817,13 @@ class Stage {
     }
     setDisplay() {
         this.puzzleLayer.setAttribute("transform", `translate(${this.scrollX} ${this.scrollY}) scale(${this.scale})`);
+    }
+    resetView() {
+        this.scrollX = 0;
+        this.scrollY = 0;
+        this.scale = 1;
+        this.scaleIndex = 3;
+        this.setDisplay();
     }
     scroll(x, y) {
         this.scrollX = x;

@@ -113,7 +113,7 @@ async function init() {
             let cx = ev.clientX - stageRect.left;
             let cy = ev.clientY - stageRect.top;
 
-            if (ev.deltaY > 0) {
+            if (ev.deltaY < 0) {
                 stage.scaleUp(cx, cy);
             } else {
                 stage.scaleDown(cx, cy);
@@ -229,6 +229,7 @@ async function init() {
         let puzzle_string = make_puzzle_web2(height, width);
 
         stage.init(width, height, puzzle_string);
+        stage.resetView();
     });
     document.getElementById("undo")!.addEventListener("click", () => {
         stage.loadLineInfo(stage.lineInfoIndex - 1);

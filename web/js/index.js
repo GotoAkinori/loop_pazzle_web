@@ -452,6 +452,7 @@ function init() {
         });
         // PC
         {
+            const PREVENT_CLICK_MOVE_DIST = 10;
             document.addEventListener("keydown", (ev) => {
                 // svg element won't be active. so insteadly check if "body is active".
                 if (document.activeElement == document.body) {
@@ -462,7 +463,7 @@ function init() {
                                 ev.preventDefault();
                             }
                             case "KeyY": {
-                                stage.loadLineInfo(stage.lineInfoIndex - 1);
+                                stage.loadLineInfo(stage.lineInfoIndex + 1);
                                 ev.preventDefault();
                             }
                         }
@@ -484,8 +485,11 @@ function init() {
             });
             window.addEventListener("mousemove", (ev) => {
                 if (dragging) {
-                    preventClick = true;
                     stage.scroll(ev.clientX - dragX + scrollX, ev.clientY - dragY + scrollY);
+                    // prevent click
+                    if ((ev.clientX - dragX) * (ev.clientX - dragX) + (ev.clientY - dragY) * (ev.clientY - dragY) > PREVENT_CLICK_MOVE_DIST * PREVENT_CLICK_MOVE_DIST) {
+                        preventClick = true;
+                    }
                 }
             });
             window.addEventListener("mouseup", () => {
@@ -510,7 +514,7 @@ function init() {
             let prevCY = -1;
             let prevDist = -1;
             let initDist = -1;
-            const scaleInterval = 20;
+            const SCALE_INTERVAL = 20;
             let gestureStarted = false;
             let pointers = [];
             function getDistance() {
@@ -553,8 +557,8 @@ function init() {
                     let currCX = (pointers[0].clientX + pointers[1].clientX) / 2;
                     let currCY = (pointers[0].clientY + pointers[1].clientY) / 2;
                     let currDist = getDistance();
-                    let prevScaleIndex = Math.floor((prevDist - initDist) / scaleInterval);
-                    let currScaleIndex = Math.floor((currDist - initDist) / scaleInterval);
+                    let prevScaleIndex = Math.floor((prevDist - initDist) / SCALE_INTERVAL);
+                    let currScaleIndex = Math.floor((currDist - initDist) / SCALE_INTERVAL);
                     // pinch out / pinch in
                     if (!gestureStarted) {
                         gestureStarted = true;
@@ -581,7 +585,6 @@ function init() {
                     prevCX = currCX;
                     prevCY = currCY;
                     prevDist = currDist;
-                    preventClick = true;
                 }
                 else {
                     gestureStarted = false;

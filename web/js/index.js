@@ -451,21 +451,25 @@ function init() {
             }
         });
         // PC
-        {
+        if (!navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
             const PREVENT_CLICK_MOVE_DIST = 10;
             document.addEventListener("keydown", (ev) => {
                 // svg element won't be active. so insteadly check if "body is active".
                 if (document.activeElement == document.body) {
                     if (ev.ctrlKey) {
                         switch (ev.code) {
-                            case "KeyZ": {
-                                stage.loadLineInfo(stage.lineInfoIndex - 1);
-                                ev.preventDefault();
-                            }
-                            case "KeyY": {
-                                stage.loadLineInfo(stage.lineInfoIndex + 1);
-                                ev.preventDefault();
-                            }
+                            case "KeyZ":
+                                {
+                                    stage.loadLineInfo(stage.lineInfoIndex - 1);
+                                    ev.preventDefault();
+                                }
+                                break;
+                            case "KeyY":
+                                {
+                                    stage.loadLineInfo(stage.lineInfoIndex + 1);
+                                    ev.preventDefault();
+                                }
+                                break;
                         }
                     }
                 }
@@ -509,7 +513,7 @@ function init() {
                 }
             });
         }
-        { // Mobile
+        else { // Mobile
             let prevCX = -1;
             let prevCY = -1;
             let prevDist = -1;
@@ -530,10 +534,16 @@ function init() {
                 }
                 // reset previous distance of 2 pointers
                 gestureStarted = false;
+                if (pointers.length > 0) {
+                    preventClick = true;
+                }
+                else {
+                    preventClick = false;
+                }
             }
             // prevent default event (pinch operation)
             document.body.addEventListener('touchmove', (e) => {
-                if (e.touches.length > 1) {
+                if (e.touches.length >= 2) {
                     e.preventDefault();
                 }
             }, { passive: false });
@@ -543,7 +553,7 @@ function init() {
             stageSvg.addEventListener("pointerdown", (ev) => {
                 pointers.push(ev);
                 if (pointers.length >= 2) {
-                    preventClick = false;
+                    preventClick = true;
                 }
             });
             stageSvg.addEventListener("pointermove", (ev) => {
